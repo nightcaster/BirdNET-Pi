@@ -95,6 +95,11 @@ if(isset($_GET["latitude"])){
   } else {
     $apprise_weekly_report = 0;
   }
+  if(isset($_GET['apprise_api_mode'])) {
+    $apprise_api_mode = 1;
+  } else {
+    $apprise_api_mode = 0;
+  }
 
   if(isset($timezone) && in_array($timezone, DateTimeZone::listIdentifiers())) {
     # dpkg-reconfigure tzdata is a pain to run non-interactively, so we do it in two steps instead
@@ -142,6 +147,7 @@ if(isset($_GET["latitude"])){
   $contents = preg_replace("/APPRISE_NOTIFY_NEW_SPECIES=.*/", "APPRISE_NOTIFY_NEW_SPECIES=$apprise_notify_new_species", $contents);
   $contents = preg_replace("/APPRISE_NOTIFY_NEW_SPECIES_EACH_DAY=.*/", "APPRISE_NOTIFY_NEW_SPECIES_EACH_DAY=$apprise_notify_new_species_each_day", $contents);
   $contents = preg_replace("/APPRISE_WEEKLY_REPORT=.*/", "APPRISE_WEEKLY_REPORT=$apprise_weekly_report", $contents);
+  $contents = preg_replace("/APPRISE_API_MODE=.*/", "APPRISE_API_MODE=$apprise_api_mode", $contents);
   $contents = preg_replace("/FLICKR_API_KEY=.*/", "FLICKR_API_KEY=$flickr_api_key", $contents);
   if(strlen($language) == 2){
     $contents = preg_replace("/DATABASE_LANG=.*/", "DATABASE_LANG=$language", $contents);
@@ -538,6 +544,8 @@ https://discordapp.com/api/webhooks/{WebhookID}/{WebhookToken}
       <label for="apprise_weekly_report">Notify each new detection</label><br>
       <input type="checkbox" name="apprise_weekly_report" <?php if($config['APPRISE_WEEKLY_REPORT'] == 1 && filesize($home."/BirdNET-Pi/apprise.txt") != 0) { echo "checked"; };?> >
       <label for="apprise_weekly_report">Send <a href="views.php?view=Weekly%20Report"> weekly report</a></label><br>
+      <input type="checkbox" name="apprise_api_mode" <?php if($config['APPRISE_API_MODE'] == 1) { echo "checked"; };?> >
+      <label for="apprise_api_mode">Enable Apprise API Mode (send notifications for every detection)</label><br>
 
       <hr>
       <label for="minimum_time_limit">Minimum time between notifications of the same species (sec):</label>
