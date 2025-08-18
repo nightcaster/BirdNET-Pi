@@ -161,8 +161,11 @@ def apprise(file: ParseFileName, detections: [Detection]):
                                          conf['OVERLAP'], dict(conf), DB_PATH)
             except BaseException as e:
                 log.exception('Error during Apprise:', exc_info=e)
-
-            species_apprised_this_run.append(detection.species)
+            # if new config.apprise_api_mode == true, skip adding to the list
+            # as all detections should trigger notifications
+            # assume if not set then conf['APPRISE_API_MODE'] is False
+            if conf['APPRISE_API_MODE'] != True:
+                species_apprised_this_run.append(detection.species)
 
 
 def bird_weather(file: ParseFileName, detections: [Detection]):
