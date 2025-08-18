@@ -164,7 +164,10 @@ def apprise(file: ParseFileName, detections: [Detection]):
             # if new config.apprise_api_mode == true, skip adding to the list
             # as all detections should trigger notifications
             # assume if not set then conf['APPRISE_API_MODE'] is False
-            if conf['APPRISE_API_MODE'] != True:
+            api_mode = int(conf.get('APPRISE_API_MODE', 0))
+            if api_mode == 1:
+                log.info("APPRISE_API_MODE is set to 1; will notifiy again if this species is found in this run")
+            else:
                 species_apprised_this_run.append(detection.species)
 
 
