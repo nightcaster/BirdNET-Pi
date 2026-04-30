@@ -167,9 +167,11 @@ required=("/home/$BIRDNET_USER/BirdNET-Pi/birdnet.conf"
 
 # these may or may not exist
 optional=("/home/$BIRDNET_USER/BirdNET-Pi/apprise.txt"
+"/home/$BIRDNET_USER/BirdNET-Pi/body.txt"
 "/home/$BIRDNET_USER/BirdNET-Pi/scripts/blacklisted_images.txt"
 "/home/$BIRDNET_USER/BirdNET-Pi/scripts/disk_check_exclude.txt"
 "/home/$BIRDNET_USER/BirdNET-Pi/exclude_species_list.txt"
+"/home/$BIRDNET_USER/BirdNET-Pi/confirmed_species_list.txt"
 "/home/$BIRDNET_USER/BirdNET-Pi/include_species_list.txt")
 
 [ $ACTION == "backup" ] && backup_check
