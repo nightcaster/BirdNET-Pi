@@ -173,6 +173,7 @@ if(isset($_GET['view'])){
       <button type=\"submit\" name=\"view\" value=\"Included\" form=\"views\">Custom Species List</button>
       <button type=\"submit\" name=\"view\" value=\"Excluded\" form=\"views\">Excluded Species List</button>
       <button type=\"submit\" name=\"view\" value=\"Whitelisted\" form=\"views\">Whitelist Species List</button>
+      <button type=\"submit\" name=\"view\" value=\"Common\" form=\"views\">Common Species List</button>
       <button type=\"submit\" name=\"view\" value=\"Species Management\" form=\"views\">Species Management</button>
       </form>
       </div>";
@@ -202,6 +203,14 @@ if(isset($_GET['view'])){
         update_species_list("./scripts/whitelist_species_list.txt", $_GET['species'], isset($_GET['add']));
     }
     $species_list="whitelist";
+    include('./scripts/species_list.php');
+  }
+  if($_GET['view'] == "Common"){
+    ensure_authenticated();
+    if(isset($_GET['species']) && (isset($_GET['add']) or isset($_GET['del']))){
+        update_species_list("./scripts/common_species_list.txt", $_GET['species'], isset($_GET['add']));
+    }
+    $species_list="common";
     include('./scripts/species_list.php');
   }
   if($_GET['view'] == "Species Management"){

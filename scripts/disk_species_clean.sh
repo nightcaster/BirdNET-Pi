@@ -4,11 +4,12 @@
 
 source /etc/birdnet/birdnet.conf
 base_dir="$HOME/BirdSongs/Extracted/By_Date"
-max_files_species="${MAX_FILES_SPECIES:-1000}"
+max_files_species="${MAX_FILES_SPECIES:-0}"
+max_files_common="${MAX_FILES_COMMON:-0}"
 cd "$base_dir" || true
 
-# If max_files_species is not higher than 1, exit
-if [[ "$max_files_species" -lt 1 ]]; then
+# If both max_files_species and max_files_common are 0, exit early
+if [[ "$max_files_species" -lt 1 ]] && [[ "$max_files_common" -lt 1 ]]; then
     exit 0
 fi
 
@@ -48,8 +49,44 @@ fi
 # This appends a fake "temp" file, so that the sudo rm has at least one file to delete and does not hang
 # Delete files, then once all files are deleted echo the number of remaining files
 
+# Load common species names and sanitize them to match folder names (e.g. Blue_Jay)
+common_species_file="$HOME/BirdNET-Pi/scripts/common_species_list.txt"
+common_species_list=""
+if [ -f "$common_species_file" ]; then
+    while read -r line; do
+        # Extract common name (part after the first underscore)
+        com_name=$(echo "$line" | cut -d'_' -f2-)
+        if [ -n "$com_name" ]; then
+            # Sanitize in the same way as BirdNET-Pi sanitizes folder names
+            san_com=$(echo "$com_name" | tr ' ' '_' | tr -d "'" | sed 's/_*$//')
+            common_species_list="$common_species_list $san_com"
+        fi
+    done < "$common_species_file"
+fi
+
 # Read each line from the variable and echo the species
 while read -r species; do
+    # Check if this species is common
+    is_common=false
+    for common in $common_species_list; do
+        if [ "$common" = "$species" ]; then
+            is_common=true
+            break
+        fi
+    done
+
+    # Select appropriate threshold
+    if [ "$is_common" = true ]; then
+        threshold="$max_files_common"
+    else
+        threshold="$max_files_species"
+    fi
+
+    # If threshold is 0 (keep all/unlimited), skip purging for this species
+    if [[ "$threshold" -lt 1 ]]; then
+        continue
+    fi
+
     echo -n "$species : "
     species_san="${species/-/=}"
     # Dummy file to execute the rm using xargs even if no files are there. Best solution found for code speed
@@ -67,7 +104,7 @@ while read -r species; do
         grep -vFf "$HOME/BirdNET-Pi/scripts/disk_check_exclude.txt" |
         sed "s|$species|$species_san|g" |
         sort -t'-' -k4,4nr -k1,1nr -k2,2nr -k3,3nr |
-        tail -n +"$((max_files_species + 1))" |
+        tail -n +"$((threshold + 1))" |
         sed "s|$species_san|$species|g" |
         sed 'p; s/\(\.[^.]*\)$/\1.png/' |
         awk 'BEGIN{print "temp"} {print}' |

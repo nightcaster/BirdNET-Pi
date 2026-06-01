@@ -14,6 +14,10 @@
         $title="Whitelisted";
         $message="Once the desired species has been highlighted, click it and then click ADD to have it whitelisted. This species will be detected even if below the Species Occurrence Frequency Threshold defined in the settings.<br>This is not a recommended way of working : it is preferable to first try first both Species Occurrence models (v1 and v2.4).";
         $selectedfilename = './scripts/whitelist_species_list.txt';   
+    } elseif ($species_list=="common") {
+        $title="Common";
+        $message="Once the desired species has been highlighted, click it and then click ADD to have it marked as common. This species will have its audio recordings purged if they exceed the maximum number of common species recordings setting.";
+        $selectedfilename = './scripts/common_species_list.txt';
     }
     
 

@@ -42,14 +42,16 @@ $base           = realpath($base_symlink);
 $confirm_file   = __DIR__ . '/confirmed_species_list.txt';
 $exclude_file   = __DIR__ . '/exclude_species_list.txt';
 $whitelist_file = __DIR__ . '/whitelist_species_list.txt';
+$common_file    = __DIR__ . '/common_species_list.txt';
 
-foreach ([$confirm_file, $exclude_file, $whitelist_file] as $file) {
+foreach ([$confirm_file, $exclude_file, $whitelist_file, $common_file] as $file) {
     if (!file_exists($file)) touch($file);
 }
 
 $confirmed_species   = file_exists($confirm_file)   ? file($confirm_file,   FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
 $excluded_species = file_exists($exclude_file) ? array_map(fn($l) => explode('_', trim($l), 2)[0], file($exclude_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) : [];
 $whitelisted_species = file_exists($whitelist_file) ? array_map(fn($l) => explode('_', trim($l), 2)[0], file($whitelist_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) : [];
+$common_species      = file_exists($common_file)    ? array_map(fn($l) => explode('_', trim($l), 2)[0], file($common_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)) : [];
 
 $config    = get_config();
 $sf_thresh = isset($config['SF_THRESH']) ? (float)$config['SF_THRESH'] : 0.0;
@@ -93,6 +95,7 @@ if (isset($_GET['toggle'], $_GET['species'], $_GET['action'])) {
   if     ($list === 'exclude')   { $file = $exclude_file; }
   elseif ($list === 'whitelist') { $file = $whitelist_file; }
   elseif ($list === 'confirmed') { $file = $confirm_file; }
+  elseif ($list === 'common')    { $file = $common_file; }
   else { header('Content-Type: text/plain'); echo 'Invalid list type'; exit; }
 
   $lines = file_exists($file) ? file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) : [];
@@ -184,6 +187,7 @@ $result = $db->query($sql);
         <th onclick="sortTable(7)">Confirmed</th>
         <th onclick="sortTable(8)">Excluded</th>
         <th onclick="sortTable(9)">Whitelisted</th>
+        <th onclick="sortTable(10)">Common</th>
         <th>Delete</th>
       </tr>
     </thead>
@@ -204,6 +208,7 @@ $result = $db->query($sql);
   $is_confirmed   = in_array($identifier_sci, $confirmed_species, true);
   $is_excluded    = in_array($identifier_sci, $excluded_species, true);
   $is_whitelisted = in_array($identifier_sci, $whitelisted_species, true);
+  $is_common      = in_array($identifier_sci, $common_species, true);
 
   $comnamegraph = str_replace("'", "\'", $row['Com_Name']);
   $chart_cell = sprintf("<img style='height: 1em;cursor:pointer;float:unset;display:inline' title='View species stats' onclick=\"generateMiniGraph(this, '%s', 180)\" width=25 src='images/chart.svg'>", $comnamegraph);
@@ -222,6 +227,10 @@ $result = $db->query($sql);
   $white_cell = $is_whitelisted
     ? "<img style='cursor:pointer;max-width:12px;max-height:12px' src='images/check.svg' onclick=\"toggleSpecies('whitelist','{$identifier_js}','del')\">"
     : "<span class='circle-icon' onclick=\"toggleSpecies('whitelist','{$identifier_js}','add')\"></span>";
+
+  $common_cell = $is_common
+    ? "<img style='cursor:pointer;max-width:12px;max-height:12px' src='images/check.svg' onclick=\"toggleSpecies('common','{$identifier_js}','del')\">"
+    : "<span class='circle-icon' onclick=\"toggleSpecies('common','{$identifier_js}','add')\"></span>";
 
   $sciname_raw = $row['Sci_Name'];
     $info_url = get_info_url($sciname_raw);
@@ -243,6 +252,7 @@ $result = $db->query($sql);
      . "<td data-sort='".($is_confirmed?0:1)."'>".$confirm_cell."</td>"
      . "<td data-sort='".($is_excluded?0:1)."'>".$excl_cell."</td>"
      . "<td data-sort='".($is_whitelisted?0:1)."'>".$white_cell."</td>"
+     . "<td data-sort='".($is_common?0:1)."'>".$common_cell."</td>"
      . "<td><img style='cursor:pointer;max-width:20px' src='images/delete.svg' onclick=\"deleteSpecies('".addslashes($row['Sci_Name'])." + ".addslashes($row['Com_Name'])."')\"></td>"
      . "</tr>";
 } ?>

@@ -152,6 +152,13 @@ if (isset($_GET["max_files_species"])) {
         $contents = preg_replace("/MAX_FILES_SPECIES=.*/", "MAX_FILES_SPECIES=$max_files_species", $contents);
     }
 }
+
+if (isset($_GET["max_files_common"])) {
+    $max_files_common = $_GET["max_files_common"];
+    if (strcmp($max_files_common, $config['MAX_FILES_COMMON']) !== 0) {
+        $contents = preg_replace("/MAX_FILES_COMMON=.*/", "MAX_FILES_COMMON=$max_files_common", $contents);
+    }
+}
 	
   if(isset($_GET["privacy_threshold"])) {
     $privacy_threshold = $_GET["privacy_threshold"];
@@ -326,6 +333,9 @@ $newconfig = get_config();
       <p>Defines how full the disk should be before the purge operations occur.<br>Note: This variable is still active if Keep is set. This means that the servies will be stopped at the purge threshold.</p><br>
       <label for="max_files_species">Number of files to keep for each species :</label>
       <input name="max_files_species" type="number" style="width:6em;" min="0" step="1" value="<?php print($newconfig['MAX_FILES_SPECIES']);?>"/>
+      <br>
+      <label for="max_files_common">Number of detections to keep for each common species :</label>
+      <input name="max_files_common" type="number" style="width:6em;" min="0" step="1" value="<?php print($newconfig['MAX_FILES_COMMON']);?>"/>
       </td></tr><tr><td>
       If different than 0 (keep all), defines the number of files to keep for each species, with priority given to files with higher confidence. This value does not include files from the last 7 days, these new files are protected against auto-deletion.
       </td></tr><tr><td>
