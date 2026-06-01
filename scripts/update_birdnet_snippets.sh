@@ -114,6 +114,10 @@ if ! grep -E '^MAX_FILES_SPECIES=' /etc/birdnet/birdnet.conf &>/dev/null;then
   echo "MAX_FILES_SPECIES=\"0\"" >> /etc/birdnet/birdnet.conf
 fi
 
+if ! grep -E '^MAX_FILES_COMMON=' /etc/birdnet/birdnet.conf &>/dev/null;then
+  echo "MAX_FILES_COMMON=\"0\"" >> /etc/birdnet/birdnet.conf
+fi
+
 if ! grep -E '^AUTOMATIC_UPDATE=' /etc/birdnet/birdnet.conf &>/dev/null;then
   echo "AUTOMATIC_UPDATE=0" >> /etc/birdnet/birdnet.conf
 fi
