@@ -101,7 +101,7 @@ while read -r species; do
         -not -name "*$(date -d "-2$dateformat" '+%Y-%m-%d')*" \
         -not -name "*$(date -d "-1$dateformat" '+%Y-%m-%d')*" \
         -not -name "*$(date '+%Y-%m-%d')*" |
-        grep -vFf "$HOME/BirdNET-Pi/scripts/disk_check_exclude.txt" |
+        grep -vFf <(grep -v '^[[:space:]]*$' "$HOME/BirdNET-Pi/scripts/disk_check_exclude.txt") |
         sed "s|$species|$species_san|g" |
         sort -t'-' -k4,4nr -k1,1nr -k2,2nr -k3,3nr |
         tail -n +"$((threshold + 1))" |
