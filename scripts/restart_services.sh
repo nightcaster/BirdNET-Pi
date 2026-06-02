@@ -20,6 +20,9 @@ if [ -n "${TARGET_USER}" ]; then
   if pgrep -u "${TARGET_USER}" pulseaudio &>/dev/null; then
     sudo pkill -9 -u "${TARGET_USER}" pulseaudio 2>/dev/null || true
   fi
+  # Start a fresh PulseAudio instance and let it initialize the ALSA soundcard first
+  sudo -u "${TARGET_USER}" pulseaudio --start --exit-idle-time=-1 2>/dev/null || true
+  sleep 3
 fi
 
 services=(chart_viewer.service
