@@ -25,6 +25,7 @@ fi
 services=(chart_viewer.service
   spectrogram_viewer.service
   icecast2.service
+  livestream.service
   birdnet_recording.service
   birdnet_analysis.service
   birdnet_log.service
